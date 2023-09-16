@@ -15,32 +15,35 @@ baseUrl = 'http://localhost:5250/api/'
   constructor(private http: HttpClient) { }
   
 
-  getProducts(shopParams:ShopParams){
-
+  getProducts(shopParams: ShopParams) {
     let params = new HttpParams();
-
-    if(shopParams.brandId !==0){
-      params = params.append('brandId',shopParams.brandId.toString())
+  
+    if (shopParams.brandId !== 0) {
+      params = params.append('brandId', shopParams.brandId.toString());
     }
-    if(shopParams.categoryId !==0){
-      params = params.append('categoryId',shopParams.categoryId.toString())
+    if (shopParams.categoryId !== 0) {
+      params = params.append('categoryId', shopParams.categoryId.toString());
     }
-    if(shopParams.subCategoryId !==0){
-      params = params.append('subCategoryId',shopParams.subCategoryId.toString())
+    if (shopParams.subCategoryId !== 0) {
+      params = params.append('subCategoryId', shopParams.subCategoryId.toString());
     }
 
-      params = params.append('sort',shopParams.sort);
-      params = params.append('pageIndex', shopParams.pageNumber!.toString());
-      params = params.append('pageIndex', shopParams.pageSize!.toString());
-    
-
-    return this.http.get<Pagination>(this.baseUrl+'Product', {observe:'response', params})
-      .pipe(
-        map(response=>{
-          return response.body
-        })
-      )
+    if(shopParams.search)
+  {
+    params = params.append('search', shopParams.search);
   }
+    params = params.append('sort', shopParams.sort);
+    params = params.append('pageIndex', shopParams.pageNumber); 
+    params = params.append('pageSize', shopParams.pageSize);
+  
+    return this.http.get<Pagination>(this.baseUrl + 'Product', { observe: 'response', params })
+      .pipe(
+        map(response => {
+          return response.body;
+        })
+      );
+  }
+  
 
   getBrand(){
 
