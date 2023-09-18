@@ -4,8 +4,9 @@ export interface Product {
     description: string
     price: number
     productImage: string
-    category: string
-    subCategory: string
-    brand: string
+    category: number
+    subCategory: number
+    brand: number
     isActive: boolean
+    //imageFile?:File
   }

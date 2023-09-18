@@ -6,6 +6,7 @@ import { Category } from '../shared/models/category';
 import { SubCategory } from '../shared/models/subcategory';
 import { delay, map } from 'rxjs';
 import { ShopParams } from '../shared/models/shopParams';
+import { Product } from '../shared/models/product';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,9 @@ baseUrl = 'http://localhost:5250/api/'
       );
   }
   
+  getProduct(id: number) {
+    return this.http.get<Product>(this.baseUrl + 'Product/' + id);
+  }
 
   getBrand(){
 
