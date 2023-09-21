@@ -6,7 +6,7 @@
         </a>
         <span class="mb-2">{{product.price | currency:'BDT '}}</span>
         <div class="btn-group mt-auto">
-          <button type="button" class="btn btn btn-outline-secondary fa fa-shopping-cart mr-2"></button>
+          <button (click)="addItemToBasket()" type="button" class="btn btn btn-outline-secondary fa fa-shopping-cart mr-2"></button>
           <button type="button" class="btn btn btn-outline-secondary" [routerLink]="['/shop/'+product.productId]">View</button>
         </div>
     </div>

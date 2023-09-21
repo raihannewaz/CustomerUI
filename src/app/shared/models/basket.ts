@@ -1,12 +1,15 @@
+import { v4 as uuidv4 } from 'uuid';
+
 
 export interface Basket {
-    customerBasketId: number
-    customerId: string
-    basketItem: BasketItem[]
-  }
+  customerId: string;
+  basketItem: BasketItem[];
+}
+
   
   export interface BasketItem {
-    basketItemId: number
+    basketItemId?: number
+    productId:number
     productName: string
     price: number
     quantity: number
@@ -14,13 +17,11 @@ export interface Basket {
     brand: string
     category: string
     subCategory: string
-    customerBasketId: number
   }
   
 
-export class ClBasket implements Basket {
-    customerBasketId!: number
-    customerId!: string
-    basketItem!: BasketItem[]
-    
-}
+  export class ClBasket implements Basket {
+    customerId=uuidv4();
+    basketItem: BasketItem[] = [];
+  }
+  
