@@ -1,0 +1,24 @@
+<div class="bg-light px-4 py-3 text-uppercase font-weight-bold">
+    Order Summery
+</div>
+<div class="p-4">
+<p class="font-italic mb-4">Shipping Cost Depenedce On Method</p>
+<ul class="list-unstyled mb-4" *ngIf="(basketTotal$ | async) as totals">
+
+    <li class="d-flex justify-content-between py-3 border-bottom">
+        <strong class="tetx-muted">Order Subtotal</strong>
+        <strong>{{totals.subtotal  | currency:'BDT '}}</strong>
+</li>
+
+<li class="d-flex justify-content-between py-3 border-bottom">
+    <strong class="tetx-muted">Shopping and Handling</strong>
+    <strong>{{totals.shipping | currency:'BDT '}}</strong>
+</li>
+
+
+<li class="d-flex justify-content-between py-3 border-bottom">
+    <strong class="tetx-muted">Total</strong>
+    <strong>{{totals.total | currency:'BDT '}}</strong>
+</li>
+</ul>
+</div>

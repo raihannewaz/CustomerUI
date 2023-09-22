@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
-import { Basket, BasketItem, ClBasket } from '../shared/models/basket';
+import { Basket, BasketItem, BasketTotals, ClBasket } from '../shared/models/basket';
 import { Product } from '../shared/models/product';
 
 @Injectable({
@@ -14,6 +14,11 @@ export class BasketService {
   private basketSource = new BehaviorSubject<Basket| null>(null);
   basket$ =this.basketSource.asObservable();
 
+  
+  private basketTotalSource = new BehaviorSubject<BasketTotals | null>(null);
+
+  basketTotal$ = this.basketTotalSource.asObservable();
+
   constructor(private http: HttpClient) {}
 
   getBasket(id: string): Observable<Basket>{
@@ -21,7 +26,7 @@ export class BasketService {
      .pipe(
       map((basket: Basket)=>{
         this.basketSource.next(basket);
-        console.log(this.getCurrentBasketValue());
+        this.calculateTotals();
         return basket;
       })
      )
@@ -31,6 +36,7 @@ export class BasketService {
     return this.http.post<Basket>(this.baseUrl + 'Basket', basket).subscribe(
       (response: Basket) => {
         this.basketSource.next(response);
+        this.calculateTotals();
       },
       (error) => {
         console.log(error);
@@ -89,7 +95,64 @@ export class BasketService {
     }
   }
 
+  private calculateTotals(){
+    const basket = this.getCurrentBasketValue();
+    const shipping = 0;
+    const subtotal = basket?.basketItem.reduce((a,b)=>(b.price*b.quantity)+a,0);
+    const total = subtotal! + shipping;
+    this.basketTotalSource.next({shipping,total,subtotal});
 
+  }
+
+  incrementItemQuantity(item: BasketItem) {
+    const basket = this.getCurrentBasketValue();
+    const foundItemIndex = basket?.basketItem.findIndex(a => a.productId === item.productId);
+    if (foundItemIndex !== undefined && foundItemIndex !== -1) {
+      if (basket?.basketItem[foundItemIndex].quantity !== undefined) {
+        basket.basketItem[foundItemIndex].quantity++;
+        this.setBasket(basket);
+      }
+    }
+  }
+  
+  decrementItemQuantity(item: BasketItem) {
+    const basket = this.getCurrentBasketValue();
+    
+    if (basket) {
+      const foundItemIndex = basket.basketItem.findIndex(a => a.productId === item.productId);
+  
+      if (foundItemIndex !== undefined && foundItemIndex !== -1) {
+        if (basket.basketItem[foundItemIndex].quantity > 1) {
+          basket.basketItem[foundItemIndex].quantity--;
+          this.setBasket(basket);
+        } else {
+          this.removeItemFromBasket(item);
+        }
+      }
+    }
+  }
+  
+  
+
+  removeItemFromBasket(item: BasketItem) {
+    const basket = this.getCurrentBasketValue();
+    if(basket?.basketItem.some(a=>a.basketItemId==item.basketItemId)){
+      basket.basketItem= basket.basketItem.filter(i=>i.productId==item.productId);
+      if(basket.basketItem.length>0){
+        this.setBasket(basket);
+      }else{
+        this.deleteBasket(basket);
+      }
+    }
+
+  }
+  deleteBasket(basket: Basket) {
+ return this.http.delete(this.baseUrl+'Basket?id='+basket.customerId).subscribe(()=>{this.basketSource.next(null);
+ this.basketTotalSource.next(null);
+ localStorage.removeItem('basket_id');
+},error=>{
+  console.log(error)
+});
+  
+  }
 }
-
-

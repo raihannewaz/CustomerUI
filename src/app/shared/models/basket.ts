@@ -25,3 +25,8 @@ export interface Basket {
     basketItem: BasketItem[] = [];
   }
   
+export interface BasketTotals{
+  shipping: number
+  subtotal:number | undefined
+  total:number
+}
