@@ -137,7 +137,7 @@ export class BasketService {
   removeItemFromBasket(item: BasketItem) {
     const basket = this.getCurrentBasketValue();
     if(basket?.basketItem.some(a=>a.basketItemId==item.basketItemId)){
-      basket.basketItem= basket.basketItem.filter(i=>i.productId==item.productId);
+      basket.basketItem= basket.basketItem.filter(i=>i.basketItemId==item.basketItemId);
       if(basket.basketItem.length>0){
         this.setBasket(basket);
       }else{
@@ -147,7 +147,7 @@ export class BasketService {
 
   }
   deleteBasket(basket: Basket) {
- return this.http.delete(this.baseUrl+'Basket?id='+basket.customerId).subscribe(()=>{this.basketSource.next(null);
+ return this.http.delete<Basket>(this.baseUrl+'Basket?id='+basket.customerId).subscribe(()=>{this.basketSource.next(null);
  this.basketTotalSource.next(null);
  localStorage.removeItem('basket_id');
 },error=>{
