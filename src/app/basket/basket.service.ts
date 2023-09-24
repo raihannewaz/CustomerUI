@@ -132,20 +132,41 @@ export class BasketService {
     }
   }
   
+  deleteBasketItem(basketItemId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}Basket/${basketItemId}`);
+}
+
   
 
-  removeItemFromBasket(item: BasketItem) {
-    const basket = this.getCurrentBasketValue();
-    if(basket?.basketItem.some(a=>a.basketItemId==item.basketItemId)){
-      basket.basketItem= basket.basketItem.filter(i=>i.basketItemId==item.basketItemId);
-      if(basket.basketItem.length>0){
-        this.setBasket(basket);
-      }else{
-        this.deleteBasket(basket);
-      }
-    }
+removeItemFromBasket(item: BasketItem) {
+  const basketItemId = item.basketItemId;
 
+  if (basketItemId !== undefined) {
+      this.deleteBasketItem(basketItemId).subscribe(
+          () => {
+              console.log('Item removed from the database');
+              const basket = this.getCurrentBasketValue();
+
+              if (basket?.basketItem.some(a => a.basketItemId == basketItemId)) {
+                 
+                  basket.basketItem = basket.basketItem.filter(i => i.basketItemId != basketItemId);
+
+                  if (basket.basketItem.length > 0) {
+                      this.setBasket(basket);
+                  } else {
+                      this.deleteBasket(basket);
+                  }
+              }
+          },
+          (error) => {
+              console.error('Error removing item from the database:', error);
+          }
+      );
   }
+}
+
+
+
   deleteBasket(basket: Basket) {
  return this.http.delete<Basket>(this.baseUrl+'Basket?id='+basket.customerId).subscribe(()=>{this.basketSource.next(null);
  this.basketTotalSource.next(null);
