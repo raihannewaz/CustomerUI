@@ -4,14 +4,18 @@
         <div class="d-grid">
           <button
             (click)="onClick(i)"
+            [disabled]="false"
             [class.active]="selectedIndex === i"
             class="nav-link py-3 text-uppercase fw-bold"
           >
-            {{ step.label }}
+            {{ step.label }}:{{step.completed}}
           </button>
         </div>
       </li>
     </ul>
+    <div *ngIf="selected">
+      <ng-container [ngTemplateOutlet]="selected.content"></ng-container>
+  </div>
   </div>
   
 

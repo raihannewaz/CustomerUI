@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { AccountService } from 'src/app/account/account.service';
 
 @Component({
   selector: 'app-checkout-address',
@@ -6,5 +8,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./checkout-address.component.css']
 })
 export class CheckoutAddressComponent {
+  @Input() checkoutForm?: FormGroup;
 
+  constructor(private accountService: AccountService) {}
+
+  saveUserAddress() {
+    this.accountService.updateUserAddress(this.checkoutForm?.get('addressForm')?.value).subscribe({
+      next: () => {
+        this.checkoutForm?.get('addressForm')?.reset(this.checkoutForm?.get('addressForm')?.value);
+      }
+    })
+  }
 }

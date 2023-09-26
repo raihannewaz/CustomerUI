@@ -1,1 +1,43 @@
-<p>checkout-address works!</p>
+<div class="mt-4" *ngIf="checkoutForm" [formGroup]="checkoutForm">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4>Shipping address</h4>
+        <button class="btn btn-outline-success mb-3"
+            (click)="saveUserAddress()"
+            [disabled]="!checkoutForm.get('addressForm')?.valid || 
+                !checkoutForm.get('addressForm')?.dirty"
+        >
+            Save as default address
+        </button>
+    </div>
+    <div class="row" formGroupName="addressForm">
+        <div class="form-group col-6">
+            <input placeholder="First name" formControlName="firstName" class="form-control" />
+        </div>
+        <div class="form-group col-6">
+            <input placeholder="Last name" formControlName="lastName" class="form-control" />
+        </div>
+        <div class="form-group col-6">
+            <input placeholder="Street" formControlName="street" class="form-control" />
+        </div>
+        <div class="form-group col-6">
+            <input placeholder="City" formControlName="city" class="form-control" />
+        </div>
+        <div class="form-group col-6">
+            <input placeholder="State" formControlName="state" class="form-control" />
+        </div>
+        <div class="form-group col-6">
+            <input placeholder="Zip code" formControlName="zipcode" class="form-control" />
+        </div>
+    </div>
+</div>
+<br>
+
+
+<div class="d-flex justify-content-between flex-row mb-5">
+    <button class="btn btn-outline-primary" routerLink="/basket">
+        <i class="fa fa-angle-left"></i> Back to basket
+    </button>
+    <button  class="btn btn-primary" cdkStepperNext>
+        Go to Delivery <i class="fa fa-angle-right"></i> 
+    </button>
+</div>

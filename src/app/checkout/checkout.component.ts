@@ -2,22 +2,25 @@ import { CdkStepper } from "@angular/cdk/stepper";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators} from '@angular/forms'; 
 import { StepperComponent } from "../shared/stepper/stepper.component";
+import { AccountService } from "../account/account.service";
+import { NavigationExtras, Router } from "@angular/router";
  
 @Component ({
     selector: 'app-checkout',
     templateUrl: './checkout.component.html',
     styleUrls: ['./checkout.component.css'],
     providers: [{provide: CdkStepper, useExisting: StepperComponent}]
+
+
  })
 export class CheckoutComponent implements OnInit{
-    
     checkoutForm!: FormGroup;
 
-    constructor (private fb: FormBuilder) { }
-
+    constructor(private fb: FormBuilder, private accountService: AccountService, private router:Router) { }
 
     ngOnInit() {
         this.createCheckoutForm();
+        this.getAddressFromValues();
     }
 
     createCheckoutForm(){
@@ -39,4 +42,18 @@ export class CheckoutComponent implements OnInit{
             })
         });
     }
+
+    getAddressFromValues(){
+        this.accountService.getUserAddress().subscribe(address=>{
+          if(address){
+            this.checkoutForm.get('addressForm')?.patchValue(address);
+    
+          }
+    
+        }, error=>{
+          console.log(Error);
+          
+        });
+    }   
+    
 }

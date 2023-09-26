@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment.development';
 import { User } from '../shared/models/user';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Address } from '../shared/models/address';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,7 @@ export class AccountService {
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', `Bearer ${token}`);
   
-    return this.http.get<User>(this.baseUrl + 'account', { headers }).pipe(
+    return this.http.get<User>(this.baseUrl + 'Account', { headers }).pipe(
       map((user: User) => {
         if (user) {
           localStorage.setItem('token', user.token);
@@ -48,7 +49,7 @@ export class AccountService {
 
    
    login(values: any) {
-     return this.http.post<User>(this.baseUrl + 'account/login', values).pipe(
+     return this.http.post<User>(this.baseUrl + 'Account/login', values).pipe(
        map((user: User) => {
          if(user) {
           localStorage.setItem('token', user.token);
@@ -59,7 +60,7 @@ export class AccountService {
    }
  
    register(values: any) {
-     return this.http.post<User>(this.baseUrl + 'account/register', values).pipe(
+     return this.http.post<User>(this.baseUrl + 'Account/register', values).pipe(
        map((user: User) => {
          if(user) {
           localStorage.setItem('token', user.token);
@@ -76,7 +77,15 @@ export class AccountService {
    }
  
    checkEmailExists(email: string) {
-     return this.http.get(this.baseUrl + 'account/emailexists?email=' + email);
+     return this.http.get(this.baseUrl + 'Account/emailexists?email=' + email);
    }
+
+   getUserAddress(){
+    return this.http.get<Address>(this.baseUrl+'account/address')
+  }
+
+   updateUserAddress(address: Address) {
+    return this.http.post(this.baseUrl + 'Account/address', address);
+  }
  }
  
