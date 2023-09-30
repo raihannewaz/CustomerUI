@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AccountService } from 'src/app/account/account.service';
 
@@ -9,14 +9,14 @@ import { AccountService } from 'src/app/account/account.service';
 })
 export class CheckoutAddressComponent {
   @Input() checkoutForm?: FormGroup;
+  @Output() addressDataChanged = new EventEmitter<any>();
 
   constructor(private accountService: AccountService) {}
 
   saveUserAddress() {
-    this.accountService.updateUserAddress(this.checkoutForm?.get('addressForm')?.value).subscribe({
-      next: () => {
-        this.checkoutForm?.get('addressForm')?.reset(this.checkoutForm?.get('addressForm')?.value);
-      }
-    })
+    const addressData = this.checkoutForm?.get('addressForm')?.value;
+    this.addressDataChanged.emit(addressData);
   }
+  
+  
 }

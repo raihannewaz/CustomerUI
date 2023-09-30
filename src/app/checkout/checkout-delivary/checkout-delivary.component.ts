@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DeliveryMethod } from 'src/app/shared/models/deliveryMethod';
 import { CheckoutService } from '../checkout.service';
@@ -12,6 +12,7 @@ import { BasketService } from 'src/app/basket/basket.service';
 export class CheckoutDelivaryComponent implements OnInit {
   @Input() checkoutForm!: FormGroup;
     deliveryMethods!: DeliveryMethod[];
+    @Output() deliveryMethodChanged = new EventEmitter<number>();
 
     constructor (private checkoutService: CheckoutService, private basketService:BasketService) { }
 
@@ -24,7 +25,11 @@ export class CheckoutDelivaryComponent implements OnInit {
         
     }
 
-    setShippingPrice(deliveryMethod: DeliveryMethod){
+    setShippingPrice(deliveryMethod: DeliveryMethod) {
       this.basketService.setShippingPrice(deliveryMethod);
+      const selectedDeliveryMethodId = this.checkoutForm?.get('deliveryForm')?.get('deliveryMethod')?.value;
+      this.deliveryMethodChanged.emit(selectedDeliveryMethodId);
     }
+    
+
 }

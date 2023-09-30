@@ -14,6 +14,8 @@ import { BasketService } from 'src/app/basket/basket.service';
 })
 export class CheckoutPaymentComponent implements OnInit{
   @Input() checkoutForm?: FormGroup;
+  @Input() addressData: any; 
+  @Input() deliveryMethodId!: number; 
  
  constructor(private checkoutService:CheckoutService, private basketService:BasketService){}
   
@@ -36,10 +38,6 @@ console.log(order)
 
 
 getOrderToCreate(basket: Basket | null) {
-  const deliveryMethodControl = this.checkoutForm?.get('deliveryForm')?.get('deliveryMethod');
-  const addressForm = this.checkoutForm?.get('addressForm');
-
-  // Check if basket is defined and has a customerId before accessing it
   const basketId = basket?.customerId || '';
 
   return {

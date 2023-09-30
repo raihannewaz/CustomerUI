@@ -15,6 +15,8 @@ import { NavigationExtras, Router } from "@angular/router";
  })
 export class CheckoutComponent implements OnInit{
     checkoutForm!: FormGroup;
+    addressData!: any;
+    deliveryMethodId!: number;
 
     constructor(private fb: FormBuilder, private accountService: AccountService, private router:Router) { }
 
@@ -55,5 +57,7 @@ export class CheckoutComponent implements OnInit{
           
         });
     }   
+
+    
     
 }
