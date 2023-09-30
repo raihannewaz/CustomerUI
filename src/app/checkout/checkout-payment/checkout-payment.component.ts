@@ -6,6 +6,7 @@ import { Basket, ClBasket } from 'src/app/shared/models/basket';
 import { Order, OrderToCreate } from 'src/app/shared/models/order';
 import { Address } from 'src/app/shared/models/address';
 import { BasketService } from 'src/app/basket/basket.service';
+import { NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-checkout-payment',
@@ -17,7 +18,7 @@ export class CheckoutPaymentComponent implements OnInit{
   @Input() addressData: any; 
   @Input() deliveryMethodId!: number; 
  
- constructor(private checkoutService:CheckoutService, private basketService:BasketService){}
+ constructor(private checkoutService:CheckoutService, private basketService:BasketService, private router:Router){}
   
  ngOnInit(): void {
      
@@ -28,7 +29,9 @@ export class CheckoutPaymentComponent implements OnInit{
   const basket = this.basketService.getCurrentBasketValue();
   const orderToCreate = this.getOrderToCreate(basket);
   this.checkoutService.createOrder(orderToCreate).subscribe((order:Order) =>{
-this.basketService.deleteLocalBasket()
+this.basketService.deleteLocalBasket();
+const navigation: NavigationExtras ={state:order}
+this.router.navigate(['checkout/success'], navigation)
 console.log(order)
   })
 }
