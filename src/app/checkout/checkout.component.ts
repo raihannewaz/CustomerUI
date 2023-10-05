@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { StepperComponent } from "../shared/stepper/stepper.component";
 import { AccountService } from "../account/account.service";
 import { NavigationExtras, Router } from "@angular/router";
+import { BasketService } from "../basket/basket.service";
  
 @Component ({
     selector: 'app-checkout',
@@ -18,11 +19,12 @@ export class CheckoutComponent implements OnInit{
     addressData!: any;
     deliveryMethodId!: number;
 
-    constructor(private fb: FormBuilder, private accountService: AccountService, private router:Router) { }
+    constructor(private fb: FormBuilder,private basketService:BasketService ,private accountService: AccountService, private router:Router) { }
 
     ngOnInit() {
         this.createCheckoutForm();
         this.getAddressFromValues();
+        this.getDeliveryMethodValue();
     }
 
     createCheckoutForm(){
@@ -57,7 +59,13 @@ export class CheckoutComponent implements OnInit{
           
         });
     }   
-
+    getDeliveryMethodValue() {
+        const basket = this.basketService.getCurrentBasketValue();
+        if (basket && basket.deliveryMethodId) {
+          this.checkoutForm.get('deliveryForm')?.get('deliveryMethod')
+            ?.patchValue(basket.deliveryMethodId.toString());
+        }
+      }
     
     
 }
