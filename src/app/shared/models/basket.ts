@@ -4,6 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 export interface Basket {
   customerId: string;
   basketItem: BasketItem[];
+  clientSecret?: string;
+  paymentIntentId?: string;
+  deliveryMethodId?: number;
+  shippingPrice?: number;
 }
 
   

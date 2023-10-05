@@ -8,12 +8,14 @@ import { CoreModule } from './core/core.module';
 import { ShopModule } from './shop/shop.module';
 import { HomeModule } from './home/home.module';
 import { JwtInterceptor } from './core/jwt.interceptor';
+import { OrderDetailComponent } from './order-detail/order-detail.component';
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
+    OrderDetailComponent
   ],
   imports: [
     BrowserModule,

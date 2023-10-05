@@ -15,7 +15,11 @@ const routes: Routes = [
    {path:'basket', loadChildren:()=>import('./basket/basket.module').then(mod=>mod.BasketModule),data:{breadcrumb:'Basket'} },
 
    {path:'checkout',canActivate: [AuthGuard], loadChildren:()=>import('./checkout/checkout.module').then(mod=>mod.CheckoutModule),data:{breadcrumb:'Checkout'} },
-
+   {
+    path: 'orders', 
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./order/order.module').then(m => m.OrderModule)
+  },
    {path:'account', loadChildren:()=>import('./account/account.module').then(mod=>mod.AccountModule),data:{breadcrumb:{skip:true}} },
 
    { path: '**', redirectTo: '', pathMatch: 'full' }
