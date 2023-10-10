@@ -59,19 +59,37 @@ export default class CheckoutPaymentComponent implements AfterViewInit, OnDestro
   }
 
 
-  onChange() {
-
+  onChange({ error }: { error: any }) {
+    if (error) {
+      this.cardErrors = error.message;
+    } else {
+      this.cardErrors = null as any;
+    }
   }
+  
+  
  
  submitOrder() {
   
   const basket = this.basketService.getCurrentBasketValue();
   const orderToCreate = this.getOrderToCreate(basket);
   this.checkoutService.createOrder(orderToCreate).subscribe((order:Order) =>{
-this.basketService.deleteLocalBasket();
-const navigation: NavigationExtras ={state:order}
-this.router.navigate(['checkout/success'], navigation)
-console.log(order)
+    this.stripe.confirmCardpaymrnt(basket?.clientSecret,{
+      payment_method:{
+        card: this.cardNumber,
+        billing_details:{
+          name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value
+        }
+      }
+    }).then((result: any) => { 
+      if (result && result.paymentIntent) {
+        this.basketService.deleteLocalBasket();
+        const navigation: NavigationExtras = { state: order };
+        this.router.navigate(['checkout/success'], navigation);
+        console.log(order);
+      }
+    })
+
   })
 }
 

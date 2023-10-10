@@ -1,62 +1,48 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../account.service';
-import { AsyncValidatorFn, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { map, of, switchMap, timer } from 'rxjs';
+import { debounceTime, finalize, map, of, switchMap, take, timer } from 'rxjs';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent implements OnInit {
-  registerForm!: FormGroup;
-  errors!: string[];
+export class RegisterComponent {
+  errors: string[] | null = null;
+
+  constructor(private fb: FormBuilder, private accountService: AccountService, private router: Router) {}
+
+  complexPassword = "^[A-Za-z0-9!@#$%^&*()_+}{'?/>&<,.-]{6,30}$"
 
 
-
-  constructor(private fb: FormBuilder, private accountService: AccountService,  private router: Router) {}
-
-
-  ngOnInit() {
-    this.createRegisterForm();
-   }
-
-
-  createRegisterForm() {
-    this.registerForm = this.fb.group({
-      displayName: [null,  [Validators.required]],
-      email: [null,
-       [Validators.required, Validators.pattern('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$')],
-       [this.validateEmailNotTaken()]
-      ],
-      password: [null,  [Validators.required]]
-    });
-  }
+  registerForm = this.fb.group({
+    displayName: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email], [this.validateEmailNotTaken()]],
+    password: ['', [Validators.required, Validators.pattern(this.complexPassword)]],
+  })  
 
   onSubmit() {
-    this.accountService.register(this.registerForm.value).subscribe(response => {
-      this.router.navigateByUrl('/');
-    }, error => {
-      console.log(error);
-      this.errors=error.errors;
-    });
+    this.accountService.register(this.registerForm.value).subscribe({
+      next: () => this.router.navigateByUrl('/shop'),
+      error: error => this.errors = error.errors
+    })
   }
- 
-  validateEmailNotTaken(): AsyncValidatorFn  {
-   return control => {
-     return timer(500).pipe(
-      switchMap(() => {
-        if(!control.value){
-           return of(null);
-        }
-        return this.accountService.checkEmailExists(control.value).pipe(
-          map(res => {
-            return res ?{emailExists: true} : null; 
-          }) 
-        );
-      })
-     );
-    };
+
+  validateEmailNotTaken(): AsyncValidatorFn {
+    return (control: AbstractControl) => {
+      return control.valueChanges.pipe(
+        debounceTime(1000),
+        take(1),
+        switchMap(() => {
+          return this.accountService.checkEmailExists(control.value).pipe(
+            map(result => result ? {emailExists: true} : null),
+            finalize(() => control.markAsTouched())
+          )
+        })
+      )
+
+    }
   }
 }

@@ -9,21 +9,16 @@ import { Basket } from 'src/app/shared/models/basket';
   templateUrl: './checkout-review.component.html',
   styleUrls: ['./checkout-review.component.css']
 })
-export class CheckoutReviewComponent implements OnInit{
+export class CheckoutReviewComponent {
   @Input() appStepper?: CdkStepper;
-  basket$!: Observable<Basket | null>;
 
   constructor(private basketService: BasketService) {}
-  ngOnInit() {
-   this.basket$ = this.basketService.basket$;
-  }
 
   createPaymentIntent() {
-   return this.basketService.createPaymentIntent().subscribe({
+    this.basketService.createPaymentIntent().subscribe({
       next: () => {
         this.appStepper?.next();
-      },
-      error: error => (error.message)
+      }
     })
   }
 

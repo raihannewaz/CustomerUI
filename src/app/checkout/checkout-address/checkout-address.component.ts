@@ -9,14 +9,16 @@ import { AccountService } from 'src/app/account/account.service';
 })
 export class CheckoutAddressComponent {
   @Input() checkoutForm?: FormGroup;
-  @Output() addressDataChanged = new EventEmitter<any>();
 
-  constructor(private accountService: AccountService) {}
+  constructor(private accountService: AccountService ) {}
 
   saveUserAddress() {
-    const addressData = this.checkoutForm?.get('addressForm')?.value;
-    this.addressDataChanged.emit(addressData);
+    this.accountService.updateUserAddress(this.checkoutForm?.get('addressForm')?.value).subscribe({
+      next: () => {
+       
+        this.checkoutForm?.get('addressForm')?.reset(this.checkoutForm?.get('addressForm')?.value);
+      }
+    })
   }
-  
   
 }

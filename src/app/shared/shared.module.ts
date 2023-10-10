@@ -10,11 +10,18 @@ import {CdkStepperModule} from '@angular/cdk/stepper';
 import { StepperComponent } from './stepper/stepper.component';
 import { RouterModule } from '@angular/router';
 import { BasketSummaryComponent } from './basket-summary/basket-summary.component';
+import { TextInputComponent } from './text-input/text-input.component';
 
 
 
 @NgModule({
-  declarations: [ PagingHeaderComponent, PagerComponent, OrderTotalComponent, StepperComponent, BasketSummaryComponent
+  declarations: [ PagingHeaderComponent,
+    PagerComponent,
+    OrderTotalComponent,
+    TextInputComponent,
+    StepperComponent,
+    BasketSummaryComponent,
+
 
 
   ],
@@ -34,9 +41,11 @@ import { BasketSummaryComponent } from './basket-summary/basket-summary.componen
     OrderTotalComponent,
     ReactiveFormsModule,
     BsDropdownModule,
+    TextInputComponent,
     CdkStepperModule,
     StepperComponent,
     BasketSummaryComponent
+
   ]
 })
 export class SharedModule { }
