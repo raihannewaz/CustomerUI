@@ -21,7 +21,8 @@
     <button class="btn btn-outline-primary" cdkStepperPrevious>
         <i class="fa fa-angle-left"></i> Back to address
     </button>
-    <button [disabled]="checkoutForm?.get('deliveryForm')?.invalid" class="btn btn-primary" cdkStepperNext>
-        Go to Review <i class="fa fa-angle-right"></i> 
+    <button [disabled]="checkoutForm && checkoutForm.get('deliveryForm') && checkoutForm.get('deliveryForm')?.invalid" class="btn btn-primary" cdkStepperNext>
+        Go to Review <i class="fa fa-angle-right"></i>
     </button>
+    
 </div>

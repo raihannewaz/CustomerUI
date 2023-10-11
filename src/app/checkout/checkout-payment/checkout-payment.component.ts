@@ -1,13 +1,12 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
 import { CheckoutService } from '../checkout.service';
 import { Basket, ClBasket } from 'src/app/shared/models/basket';
 import { Order, OrderToCreate } from 'src/app/shared/models/order';
 import { BasketService } from 'src/app/basket/basket.service';
 import { NavigationExtras, Router } from '@angular/router';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
+declare var Stripe: any;
 
-declare var Stripe:any;
 
 @Component({
   selector: 'app-checkout-payment',
@@ -15,7 +14,7 @@ declare var Stripe:any;
   styleUrls: ['./checkout-payment.component.css']
 })
 export default class CheckoutPaymentComponent implements AfterViewInit, OnDestroy{
-  @Input() checkoutForm?: FormGroup;
+  @Input() checkoutForm!: FormGroup;
   @Input() addressData: any; 
   @Input() deliveryMethodId!: number;
   @ViewChild('cardNumber') cardNumberElement?: ElementRef;
@@ -45,16 +44,16 @@ export default class CheckoutPaymentComponent implements AfterViewInit, OnDestro
 
     this.cardNumber = elements.create('cardNumber');
     this.cardNumber.mount(this.cardNumberElement?.nativeElement);
-    this.cardNumber.addEvenetListner('change', this.cardHandler)
+    this.cardNumber.addEventListener('change', this.cardHandler)
 
     this.cardExpiry = elements.create('cardExpiry');
     this.cardExpiry.mount(this.cardExpiryElement?.nativeElement);
-    this.cardExpiry.addEvenetListner('change', this.cardHandler)
+    this.cardExpiry.addEventListener('change', this.cardHandler)
 
 
     this.cardCvc = elements.create('cardCvc');
     this.cardCvc.mount(this.cardCvcElement?.nativeElement);
-    this.cardCvc.addEvenetListner('change', this.cardHandler)
+    this.cardCvc.addEventListener('change', this.cardHandler)
 
   }
 
@@ -74,7 +73,7 @@ export default class CheckoutPaymentComponent implements AfterViewInit, OnDestro
   const basket = this.basketService.getCurrentBasketValue();
   const orderToCreate = this.getOrderToCreate(basket);
   this.checkoutService.createOrder(orderToCreate).subscribe((order:Order) =>{
-    this.stripe.confirmCardpaymrnt(basket?.clientSecret,{
+    this.stripe.confirmCardPayment(basket?.clientSecret,{
       payment_method:{
         card: this.cardNumber,
         billing_details:{

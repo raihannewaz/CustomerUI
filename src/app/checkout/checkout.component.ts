@@ -27,25 +27,25 @@ export class CheckoutComponent implements OnInit{
         this.getDeliveryMethodValue();
     }
 
-    createCheckoutForm(){
-        this.checkoutForm = this.fb.group({
-            addressForm : this.fb.group({
-                firstName: [null, Validators.required],
-                lastName: [null, Validators.required],
-                street: [null, Validators.required],
-                city: [null, Validators.required],
-                state: [null, Validators.required],
-                zipcode: [null, Validators.required],
-
-            }),
-            deliveryForm: this.fb.group({
-                deliveryMethod: [null, Validators.required]
-            }),
-            paymenForm: this.fb.group({
-                nameOnCard: [null, Validators.required]
-            })
-        });
+    createCheckoutForm() {
+      this.checkoutForm = this.fb.group({
+        addressForm: this.fb.group({
+          firstName: [null, Validators.required],
+          lastName: [null, Validators.required],
+          street: [null, Validators.required],
+          city: [null, Validators.required],
+          state: [null, Validators.required],
+          zipcode: [null, Validators.required],
+        }),
+        deliveryForm: this.fb.group({
+          deliveryMethod: [null, Validators.required],
+        }),
+        paymentForm: this.fb.group({
+          nameOnCard: [null, Validators.required],
+        }),
+      });
     }
+    
 
     getAddressFromValues(){
         this.accountService.getUserAddress().subscribe(address=>{
