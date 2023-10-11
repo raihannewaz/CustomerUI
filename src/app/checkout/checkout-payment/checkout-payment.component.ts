@@ -26,7 +26,8 @@ export default class CheckoutPaymentComponent implements AfterViewInit, OnDestro
   cardCvc?: any;
   cardErrors!: 'Error Found';
   cardHandler = this.onChange.bind(this);
- 
+  loading=false;
+  
  constructor(private checkoutService:CheckoutService,
   private basketService:BasketService,
   private router:Router){}
@@ -68,29 +69,41 @@ export default class CheckoutPaymentComponent implements AfterViewInit, OnDestro
   
   
  
- submitOrder() {
-  
+ async submitOrder() {
+  this.loading = true;
   const basket = this.basketService.getCurrentBasketValue();
-  const orderToCreate = this.getOrderToCreate(basket);
-  this.checkoutService.createOrder(orderToCreate).subscribe((order:Order) =>{
-    this.stripe.confirmCardPayment(basket?.clientSecret,{
-      payment_method:{
-        card: this.cardNumber,
-        billing_details:{
-          name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value
-        }
-      }
-    }).then((result: any) => { 
-      if (result && result.paymentIntent) {
-        this.basketService.deleteLocalBasket();
-        const navigation: NavigationExtras = { state: order };
-        this.router.navigate(['checkout/success'], navigation);
-        console.log(order);
-      }
-    })
+  try{
+    const createdOrder = await this.createOrder(basket);
+    const paymentResult = await this.confirmPaymentWithStripe(basket);
+  
+    if (paymentResult.paymentIntent) {
+      this.basketService.deleteLocalBasket();
+      const navigation: NavigationExtras = { state: createdOrder };
+      this.router.navigate(['checkout/success'], navigation);
+      console.log(createdOrder);
+    }
+    this.loading = false;
+  }catch(error){
+    console.log(error);
+    this.loading = false;
+  }
+  
+}
 
+private async confirmPaymentWithStripe(basket:any) {
+  return this.stripe.confirmCardPayment(basket?.clientSecret,{
+    payment_method:{
+      card: this.cardNumber,
+      billing_details:{
+        name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value
+      }
+    }
   })
 }
+  private async createOrder(basket: Basket | null) {
+    const orderToCreate = this.getOrderToCreate(basket);
+    return this.checkoutService.createOrder(orderToCreate).toPromise();
+  }
 
 
 
