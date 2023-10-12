@@ -5,6 +5,8 @@ import { Order, OrderToCreate } from 'src/app/shared/models/order';
 import { BasketService } from 'src/app/basket/basket.service';
 import { NavigationExtras, Router } from '@angular/router';
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
+import { Address } from 'src/app/shared/models/address';
+import { firstValueFrom } from 'rxjs';
 declare var Stripe: any;
 
 
@@ -67,55 +69,108 @@ export default class CheckoutPaymentComponent implements AfterViewInit, OnDestro
     }
   }
   
+  async submitOrder() {
+    this.loading = true;
+    const basket = this.basketService.getCurrentBasketValue();
+    if (!basket) throw new Error('cannot get basket');
+    try {
+      const createdOrder = await this.createOrder(basket);
+      const paymentResult = await this.confirmPaymentWithStripe(basket);
+      if (paymentResult.paymentIntent) {
+        this.basketService.deleteBasket(basket);
+        const navigationExtras: NavigationExtras = {state: createdOrder};
+        this.router.navigate(['checkout/success'], navigationExtras);
+      }
+    } catch (error: any) {
+      console.log(error);
+      
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  private async confirmPaymentWithStripe(basket: Basket | null) {
+    if (!basket) throw new Error('Basket is null');
+    const result = this.stripe?.confirmCardPayment(basket.clientSecret!, {
+      payment_method: {
+        card: this.cardNumber!,
+        billing_details: {
+          name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value
+        }
+      }
+    });
+    if (!result) throw new Error('Problem attempting payment with stripe');
+    return result;
+  }
+
+  private async createOrder(basket: Basket | null) {
+    if (!basket) throw new Error('Basket is null');
+    const orderToCreate = this.getOrderToCreate(basket);
+    return firstValueFrom(this.checkoutService.createOrder(orderToCreate));
+  }
+
+  private getOrderToCreate(basket: Basket): OrderToCreate {
+    const deliveryMethodId = this.checkoutForm?.get('deliveryForm')?.get('deliveryMethod')?.value;
+    const shipToAddress = this.checkoutForm?.get('addressForm')?.value as Address;
+    if (!deliveryMethodId || !shipToAddress) throw new Error('Problem with basket');
+    return {
+      basketId: basket.customerId,
+      deliveryMethodId: deliveryMethodId,
+      shipToAddress: shipToAddress
+    }
+  }
+
+
+
   
  
- async submitOrder() {
-  this.loading = true;
-  const basket = this.basketService.getCurrentBasketValue();
-  try{
-    const createdOrder = await this.createOrder(basket);
-    const paymentResult = await this.confirmPaymentWithStripe(basket);
+//  async submitOrder() {
+//   this.loading = true;
+//   const basket = this.basketService.getCurrentBasketValue();
+//   try{
+//     const createdOrder = await this.createOrder(basket);
+//     const paymentResult = await this.confirmPaymentWithStripe(basket);
   
-    if (paymentResult.paymentIntent) {
-      this.basketService.deleteLocalBasket();
-      const navigation: NavigationExtras = { state: createdOrder };
-      this.router.navigate(['checkout/success'], navigation);
-      console.log(createdOrder);
-    }
-    this.loading = false;
-  }catch(error){
-    console.log(error);
-    this.loading = false;
-  }
+//     if (paymentResult.paymentIntent) {
+//       this.basketService.deleteLocalBasket();
+//       const navigation: NavigationExtras = { state: createdOrder };
+//       this.router.navigate(['checkout/success'], navigation);
+//       console.log(createdOrder);
+//     }
+//     this.loading = false;
+//   }catch(error){
+//     console.log(error);
+//     this.loading = false;
+//   }
   
-}
+// }
 
-private async confirmPaymentWithStripe(basket:any) {
-  return this.stripe.confirmCardPayment(basket?.clientSecret,{
-    payment_method:{
-      card: this.cardNumber,
-      billing_details:{
-        name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value
-      }
-    }
-  })
-}
-  private async createOrder(basket: Basket | null) {
-    const orderToCreate = this.getOrderToCreate(basket);
-    return this.checkoutService.createOrder(orderToCreate).toPromise();
-  }
+// private async confirmPaymentWithStripe(basket:any) {
+//   return this.stripe.confirmCardPayment(basket?.clientSecret,{
+//     payment_method:{
+//       card: this.cardNumber,
+//       billing_details:{
+//         name: this.checkoutForm?.get('paymentForm')?.get('nameOnCard')?.value
+//       }
+//     }
+//   })
+// }
+//   private async createOrder(basket: Basket | null) {
+//     const orderToCreate = this.getOrderToCreate(basket);
+//     return this.checkoutService.createOrder(orderToCreate).toPromise();
+//   }
 
 
 
-getOrderToCreate(basket: Basket | null) {
-  const basketId = basket?.customerId || '';
+// getOrderToCreate(basket: Basket | null) {
+//   const basketId = basket?.customerId || '';
 
-  return {
-    basketId: basketId,
-    deliveryMethodId: this.checkoutForm?.get('deliveryForm')?.get('deliveryMethod')?.value,
-    shipToAddress: this.checkoutForm?.get('addressForm')?.value
-  };
-}
+//   return {
+//     basketId: basketId,
+//     deliveryMethodId: this.checkoutForm?.get('deliveryForm')?.get('deliveryMethod')?.value,
+//     shipToAddress: this.checkoutForm?.get('addressForm')?.value
+//   };
+// }
 
   
 }
